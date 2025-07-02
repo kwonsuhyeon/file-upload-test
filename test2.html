@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div{
+            border:1px solid #ccc;
+            width:80px;
+            padding-left:10px;
+        }
+        input{
+            border:none;
+            width:20px;
+        }
+        input:focus{
+            outline:none;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <div>
+        <input id="gen" type="text" maxlength="1">
+        <span class="bullet">••••••</span>
+    </div>
+    <script>
+        $("#gen").focus(function(){
+            console.log($(this).parent())
+            $(this).parent().css("border", "2px solid gray");
+        })
+        document.querySelector('#gen').addEventListener("click",function(){
+            alert("클릭이벤트")
+        var image1=document.querySelector(".m1");
+
+            if(image1.src.match("media/캡1.png")){
+
+            image1.src="media/캡1-1.png";
+
+            }else{
+
+            image1.src="media/캡1.png";
+
+            }
+        })
+            </script>
+</body>
+</html>
