@@ -102,7 +102,7 @@ function formatWordsForDisplay(words) {
 // 실제 사용 예시 함수
 async function loadWordsFromGoogleSheet() {
     const sheetUrl = document.getElementById('sheetUrl').value;
-    const appScriptUrl = 'https://script.google.com/macros/s/AKfycbwE4n2-R_OWxLOV6g-DRcQZvadkzmDJ6_LXsqUjDsSoI8bWQLiVwwIE0toEk9t6Tml1/exec'
+    const appScriptUrl = 'https://script.google.com/macros/s/AKfycbwB9tVon-345BKpYtmobmaw6TJFPZzystMsvL__fOjn0UD6-7rY6V_MZvwOFTFqcg/exec'
     if (!sheetUrl) {
         alert('구글 시트 URL을 입력해주세요.');
         return;
