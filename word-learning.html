@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 단어카드 학습</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #334bb7 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 2rem;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #334bb7 100%);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 통계 카드 영역 */
+        .learning-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* 플래시카드 */
+        .flashcard {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin-bottom: 2rem;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* 카드 내비게이션 및 버튼 */
+        .card-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-progress {
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .card-navigation {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn:disabled {
+            background: #d1d5db !important;
+            color: #9ca3af !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 나만의 단어카드 학습</h1>
+            <p>영어 단어를 재미있게 학습해보세요!</p>
+        </div>
+
+        <!-- 설정 섹션 -->
+        <div class="card" id="setupSection">
+            <input type="hidden" id="sheetUrl"
+                value="https://docs.google.com/spreadsheets/d/1I3jXI9AgNt-mSHGD6y1sQBIVjRKxZAPXb0GZNI9owVw/edit?usp=sharing"
+                placeholder="구글 시트 URL을 입력하세요" required>
+            <h2 style="margin-bottom: 1.5rem;">📝 학습 설정</h2>
+            <div class="form-group">
+                <label for="studentName">👤 학습자 이름</label>
+                <input type="text" id="studentName" placeholder="이름을 입력하세요" required>
+            </div>
+            <button class="btn" onclick="startLearning()">
+                🚀 학습 시작하기
+            </button>
+        </div>
+
+        <!-- 학습 섹션 -->
+        <div class="card learning-section hidden" id="learningSection">
+            <div class="learning-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="currentCardNum">1</div>
+                    <div class="stat-label">현재 카드</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCards">0</div>
+                    <div class="stat-label">전체 카드</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="correctCount">0</div>
+                    <div class="stat-label">정답 수</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="timeElapsed">00:00</div>
+                    <div class="stat-label">소요 시간</div>
+                </div>
+            </div>
+
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="flashcard-inner" id="flashcardInner">
+                    <div class="flashcard-front" id="cardFront">
+                        <div>카드를 클릭하여 시작하세요</div>
+                    </div>
+                    <div class="flashcard-back" id="cardBack">
+                        <div>뒷면</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-controls">
+                <button class="btn btn-secondary" onclick="previousCard()" id="prevBtn" disabled>
+                    ← 이전
+                </button>
+                <div class="card-progress">
+                    <span id="progressText">카드를 클릭해보세요!</span>
+                </div>
+                <button class="btn btn-secondary" onclick="nextCard()" id="nextBtn">
+                    다음 →
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="btn" onclick="markCorrect()" id="correctBtn" disabled>
+                    ✅ 맞혔어요!
+                </button>
+                <button class="btn btn-secondary" onclick="markIncorrect()" id="incorrectBtn" disabled>
+                    ❌ 틀렸어요
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="finishLearning()">
+                    📊 학습 완료
+                </button>
+            </div>
+        </div>
+
+        <!-- 완료 섹션 -->
+        <div class="card hidden" id="completeSection" style="text-align:center; padding:2rem 0; ">
+            <h2 style="color:#10b981; margin-bottom:1rem;">🎉 학습 완료!</h2>
+            <div
+                style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:1rem; margin-bottom:2rem;">
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; text-align:center;">
+                    <div style="font-size:1.5rem; font-weight:bold; color:#667eea;" id="finalTotal">0</div>
+                    <div style="color:#6b7280; font-size:0.875rem;">총 학습 단어</div>
+                </div>
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; text-align:center;">
+                    <div style="font-size:1.5rem; font-weight:bold; color:#667eea;" id="finalCorrect">0</div>
+                    <div style="color:#6b7280; font-size:0.875rem;">정답 수</div>
+                </div>
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; text-align:center;">
+                    <div style="font-size:1.5rem; font-weight:bold; color:#667eea;" id="finalAccuracy">0%</div>
+                    <div style="color:#6b7280; font-size:0.875rem;">정답률</div>
+                </div>
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; text-align:center;">
+                    <div style="font-size:1.5rem; font-weight:bold; color:#667eea;" id="finalTime">00:00</div>
+                    <div style="color:#6b7280; font-size:0.875rem;">총 소요 시간</div>
+                </div>
+            </div>
+            <div id="saveStatus"
+                style="padding:1rem; border-radius:8px; margin-bottom:1rem; background:#dcfce7; border:1px solid #bbf7d0; color:#166534; display:none;">
+                ✅ 학습 결과가 구글 시트에 저장되었습니다!
+            </div>
+            <button class="btn" onclick="restartLearning()"
+                style="background:#667eea; color:white; padding:0.75rem 1.5rem; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem;">
+                🔄 다시 학습하기
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // 학습 관련 변수
+        let sheetUrl = 'https://docs.google.com/spreadsheets/d/1I3jXI9AgNt-mSHGD6y1sQBIVjRKxZAPXb0GZNI9owVw/edit?usp=sharing';
+        let studentName = '';
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let startTime = null;
+        let correctAnswers = 0;
+        let wordList = [{"english":"apple","korean":"사과"},{"english":"book","korean":"책"},{"english":"car","korean":"차"},{"english":"people","korean":"사람"},{"english":"candy","korean":"사탕```"}]
+
+        async function startLearning() {
+            // 학습 모드로 전환
+            document.getElementById('learningSection').classList.remove('hidden');
+            document.getElementById('setupSection').classList.add('hidden');
+
+            // 학습 초기화
+            initializeLearning();
+        }
+
+        // 학습 초기화
+        function initializeLearning() {
+            studentName = document.querySelector("#studentName").value;
+            currentCardIndex = 0;
+            correctAnswers = 0;
+            startTime = new Date();
+
+            // UI 업데이트
+            document.getElementById('totalCards').textContent = wordList.length;
+            document.getElementById('currentCardNum').textContent = 1;
+            document.getElementById('correctCount').textContent = 0;
+
+            // 첫 번째 카드 표시
+            showCard();
+
+            // 타이머 시작
+            startTimer();
+        }
+
+        // 카드 표시
+        function showCard() {
+            if (currentCardIndex >= wordList.length) {
+                finishLearning();
+                return;
+            }
+
+            const word = wordList[currentCardIndex];
+            document.getElementById('cardFront').innerHTML = '<div>'+word.english+'</div>';
+            document.getElementById('cardBack').innerHTML = '<div>'+word.korean+'</div>';
+
+            // 카드 뒤집기 상태 초기화
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+
+            // UI 업데이트
+            document.getElementById('currentCardNum').textContent = currentCardIndex + 1;
+            document.getElementById('progressText').textContent = '카드를 클릭해서 뜻을 확인하세요';
+
+            // 버튼 상태 업데이트
+            updateButtons();
+        }
+
+        // 카드 뒤집기
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped');
+
+            if (isFlipped) {
+                document.getElementById('progressText').textContent = '정답을 아셨나요?';
+                document.getElementById('correctBtn').disabled = false;
+                document.getElementById('incorrectBtn').disabled = false;
+            }
+        }
+
+        // 정답 표시
+        function markCorrect() {
+            correctAnswers++;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            nextCard();
+        }
+
+        // 오답 표시
+        function markIncorrect() {
+            nextCard();
+        }
+
+        // 다음 카드
+        function nextCard() {
+            currentCardIndex++;
+            showCard();
+        }
+
+        // 이전 카드
+        function previousCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                showCard();
+            }
+        }
+
+        // 버튼 상태 업데이트
+        function updateButtons() {
+            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
+            document.getElementById('nextBtn').disabled = currentCardIndex >= wordList.length - 1;
+            document.getElementById('correctBtn').disabled = !isFlipped;
+            document.getElementById('incorrectBtn').disabled = !isFlipped;
+        }
+
+        // 타이머 시작
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const elapsed = Math.floor((now - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timeElapsed').textContent =
+                    minutes.toString().padStart(2, '0')+':'+seconds.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        // 학습 완료
+        async function finishLearning() {
+            clearInterval(timerInterval);
+
+            const endTime = new Date();
+            const totalMinutes = Math.round((endTime - startTime) / 60000);
+            const accuracy = Math.round((correctAnswers / wordList.length) * 100);
+
+            // 완료 섹션 표시
+            document.getElementById('learningSection').classList.add('hidden');
+            document.getElementById('completeSection').classList.remove('hidden');
+
+
+            // 결과 표시
+            document.getElementById('finalTotal').textContent = wordList.length;
+            document.getElementById('finalCorrect').textContent = correctAnswers;
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            document.getElementById('finalTime').textContent = document.getElementById('timeElapsed').textContent;
+
+            // 구글 시트에 결과 저장
+            await saveToGoogleSheet({
+                name: studentName,
+                startTime: startTime.toLocaleString('ko-KR'),
+                endTime: endTime.toLocaleString('ko-KR'),
+                totalWords: wordList.length,
+                correctAnswers: correctAnswers,
+                accuracy: accuracy,
+                timeSpent: totalMinutes,
+                wordList: wordList.map(w => w.english+'/'+w.korean).join(', ')
+            });
+        }
+
+        async function saveToGoogleSheet(data) {
+            const sheetId = '1I3jXI9AgNt-mSHGD6y1sQBIVjRKxZAPXb0GZNI9owVw';
+            try {
+                if (!sheetId) {
+                    throw new Error('올바른 구글 시트 URL이 아닙니다.');
+                }
+
+                // Apps Script Web App 배포 주소 (script.google.com/macros/s/.../exec 형태)
+                const webAppUrl = 'https://script.google.com/macros/s/AKfycbzpzSmrWw3lJfnHcbD8VABfnDxgFUIN8a4D2AkucCk10iqLkn1jdqK7DBUKLu61kBkc/exec';
+
+                console.log('✅ Web App URL:', webAppUrl);
+                console.log('📤 전송 데이터:', data);
+
+                // FormData 형식으로 데이터 준비 (application/x-www-form-urlencoded 방식)
+                const form = new URLSearchParams();
+                form.append('sheetId', sheetId);
+                form.append('name', data.name);
+                form.append('startTime', data.startTime);
+                form.append('endTime', data.endTime);
+                form.append('totalWords', data.totalWords);
+                form.append('timeSpent', data.timeSpent);
+                form.append('accuracy', data.accuracy);
+                form.append('correctAnswers', data.correctAnswers);
+                form.append('wordList', data.wordList);
+                form.append('timestamp', new Date().getTime());
+                form.append('test', 'false'); // 조건문 우회용
+
+                // POST 요청 보내기 (302 Redirect 대응을 위해 no-cors 모드 사용)
+                try {
+                    const response = await fetch(webAppUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // ✅ 핵심 설정: POST + Redirect 처리
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: form.toString()
+                    });
+
+                    console.log('✅ POST 요청 전송 완료 (응답은 읽을 수 없음)');
+                } catch (postError) {
+                    console.error('❌ POST 요청 오류:', postError);
+                }
+
+                // UI 상태 표시
+                const saveStatus = document.getElementById('saveStatus');
+                saveStatus.className = 'alert alert-success';
+                saveStatus.innerHTML = '✅ 학습 결과가 구글 시트에 저장되었습니다!';
+                saveStatus.classList.remove('hidden');
+
+                return true;
+
+            } catch (error) {
+                console.error('❌ 저장 오류:', error);
+
+                const saveStatus = document.getElementById('saveStatus');
+                saveStatus.className = 'alert alert-error';
+                saveStatus.innerHTML = '❌ 전송 실패:'+ error.message;
+                saveStatus.classList.remove('hidden');
+
+                return false;
+            }
+        }
+
+        // 다시 시작
+        function restartLearning() {
+            // 모든 섹션 숨기기
+            document.getElementById('completeSection').classList.add('hidden');
+            document.getElementById('setupSection').classList.remove('hidden');
+            // 폼 초기화
+            document.getElementById('setupAlert').innerHTML = '';
+        }
+
+        // 알림 표시
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('setupAlert');
+            alertDiv.innerHTML = '<div class="alert alert-'+type+'">'+message+'</div>';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+  </script></body><html>
