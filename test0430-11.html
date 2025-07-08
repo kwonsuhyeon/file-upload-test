@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 600px;
+            display: grid;
+            grid-template-columns:repeat(3, 1fr);
+            grid-template-rows: minmax(100px, auto) minmax(300px,auto);
+        }
+        .items{
+            padding: 10px;
+            background-color: #eee;
+
+        }
+        .items:nth-child(odd){
+            background-color: #bbb;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div class="items">odit facilis inventore? Placeat, dolore. Eos corrupti saepe voluptatum quasi r</div>
+        <div class="items"> odits corrupti saepe voluptatum quasi repellendus </div>
+        <div class="items">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Accusantium accusamus doloremque similique officia aliquid sequi minus? Fuga laudantium atque veniam aperiam natus nisi asperiores obcaecati. Omnis, eveniet vel quia fugiat at recusandae et magni natus dolore assumenda! Voluptates inventore tenetur incidunt similique numquam nam, sed cumque sint eligendi possimus voluptas aspernatur aut? Harum enim, dolore assumenda asperiores, ducimus ullam eum reprehenderit nostrum voluptas labore dolores quo! Quos earum cum ab totam porro repellat in excepturi, obcaecati tenetur? Quasi porro neque expedita ad, architecto temporibus odio officiis dolores autem. Beatae, voluptates maxime! Iure itaque accusantium dolor nulla iusto. Asperiores, dicta ipsa iure sapiente pariatur dolor odio nesciunt harum debitis eligendi officia est non, laboriosam expedita perferendis odit hic, ratione aperiam architecto maxime! Obcaecati neque unde architecto qui, minima ullam excepturi enim commodi, harum voluptatibus delectus cum inventore reprehenderit? Laborum aliquam nesciunt tempora debitis. Quia blanditiis nihil possimus ut nemo hic deleniti quo totam, voluptates architecto similique repellendus maxime ab molestias nisi magni quidem eum ipsum pariatur numquam, voluptatum perspiciatis quam. Cum saepe quod quae magnam ipsam ea laudantium expedita. Nostrum reprehenderit delectus voluptates iure voluptas aut unde omnis perferendis facilis nesciunt praesentium, cumque animi porro quasi, perspiciatis odio autem optio nemo!</div>
+        <div class="items">Lorem ipsum dolor sit amet consectetur </div>
+        <div class="items">Lorem ipsum dolor sit </div>
+        <div class="items"></div>
+    </div>
+</body>
+</html>
